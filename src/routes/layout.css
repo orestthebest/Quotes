@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+@theme {
+	--font-serif: 'Besley', Georgia, serif;
+	--font-sans: 'Familjen Grotesk', system-ui, sans-serif;
+
+	--color-paper: #f2efe6;
+	--color-ink: #1b1b1f;
+	--color-muted: #67645c;
+	--color-accent: #d6336f;
+
+	--color-tomato: #d63d22;
+	--color-teal: #0071b4;
+	--color-mustard: #a87400;
+	--color-plum: #d6336f;
+	--color-cobalt: #008a4b;
+}
+
+html {
+	background: var(--color-paper);
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: var(--color-mustard);
+	color: var(--color-ink);
+}
+
+/* numbered + colored quotes */
+.quotes {
+	counter-reset: quote;
+}
+
+.quotes > div {
+	counter-increment: quote;
+	position: relative;
+}
+
+.quotes > div:nth-child(5n + 1) { --q: var(--color-tomato); }
+.quotes > div:nth-child(5n + 2) { --q: var(--color-teal); }
+.quotes > div:nth-child(5n + 3) { --q: var(--color-mustard); }
+.quotes > div:nth-child(5n + 4) { --q: var(--color-plum); }
+.quotes > div:nth-child(5n + 5) { --q: var(--color-cobalt); }
+
+.quotes > div > header {
+	color: var(--q);
+}
+
+.quotes > div::before {
+	content: counter(quote, decimal-leading-zero);
+	display: block;
+	margin-bottom: 0.75rem;
+	font-family: var(--font-serif);
+	font-style: italic;
+	font-size: 1.5rem;
+	color: var(--q);
+}
+
+@media (min-width: 768px) {
+	.quotes > div {
+		padding-left: 4.5rem;
+	}
+
+	.quotes > div::before {
+		position: absolute;
+		left: 0;
+		top: 2.75rem;
+		margin: 0;
+		font-size: 2.25rem;
+	}
+}
+
+
+::selection {
+	background: var(--color-accent);
+	color: var(--color-paper);
+}
