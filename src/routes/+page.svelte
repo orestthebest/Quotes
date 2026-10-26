@@ -1,5 +1,56 @@
 <script>
 	import Quote from '#lib/components/Quote.svelte';
+
+	let quotes = $state([
+		{
+			id: 'socrates',
+			author: 'Socrates',
+			text: 'The unexamined life is not worth living.',
+			column: 'left'
+		},
+		{
+			id: 'seneca',
+			author: 'Seneca',
+			text: 'While we are postponing, life speeds by.',
+			column: 'left'
+		},
+		{
+			id: 'mandela',
+			author: 'Nelson Mandela',
+			text: 'Education is the most powerful weapon which you can use to change the world.',
+			column: 'left'
+		},
+		{
+			id: 'roosevelt',
+			author: 'Franklin D. Roosevelt',
+			text: 'The only thing we have to fear is fear itself.',
+			column: 'left'
+		},
+		{
+			id: 'vangogh',
+			author: 'Vincent van Gogh',
+			text: 'Great things are done by a series of small things brought together.',
+			column: 'left'
+		}
+	]);
+
+	function startDrag(event, id) {
+		event.dataTransfer.setData('text/plain', id);
+		event.dataTransfer.effectAllowed = 'move';
+	}
+
+	function allowDrop(event) {
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'move';
+	}
+
+	function dropQuote(event, column) {
+		event.preventDefault();
+		const id = event.dataTransfer.getData('text/plain');
+		const quote = quotes.find((item) => item.id === id);
+
+		if (quote) quote.column = column;
+	}
 </script>
 
 <svelte:head>
@@ -18,26 +69,44 @@
 	</p>
 </header>
 
-<section class="quotes">
+<section class="grid gap-6 md:grid-cols-2">
+	<div
+		aria-label="Red quote area"
+		class="min-h-64 rounded-2xl bg-red-100 p-5 sm:p-6"
+		ondragover={allowDrop}
+		ondrop={(event) => dropQuote(event, 'left')}
+		role="list"
+	>
+		<h2 class="mb-2 text-sm font-medium uppercase tracking-wider">Quotes</h2>
+		{#each quotes.filter((quote) => quote.column === 'left') as quote (quote.id)}
+			<div
+				class="cursor-grab active:cursor-grabbing"
+				draggable="true"
+				ondragstart={(event) => startDrag(event, quote.id)}
+				role="listitem"
+			>
+				<Quote author={quote.author}>{quote.text}</Quote>
+			</div>
+		{/each}
+	</div>
 
-	<Quote author="Socrates">
-		The unexamined life is not worth living.
-	</Quote>
-
-	<Quote author="Seneca">
-		While we are postponing, life speeds by.
-	</Quote>
-
-	<Quote author="Nelson Mandela">
-		Education is the most powerful weapon which you can use to change the world.
-	</Quote>
-
-	<Quote author="Franklin D. Roosevelt">
-		The only thing we have to fear is fear itself.
-	</Quote>
-
-	<Quote author="Vincent van Gogh">
-		Great things are done by a series of small things brought together.
-	</Quote>
-
+	<div
+		aria-label="Blue quote area"
+		class="min-h-64 rounded-2xl bg-blue-100 p-5 sm:p-6"
+		ondragover={allowDrop}
+		ondrop={(event) => dropQuote(event, 'right')}
+		role="list"
+	>
+		<h2 class="mb-2 text-sm font-medium uppercase tracking-wider">Favorites</h2>
+		{#each quotes.filter((quote) => quote.column === 'right') as quote (quote.id)}
+			<div
+				class="cursor-grab active:cursor-grabbing"
+				draggable="true"
+				ondragstart={(event) => startDrag(event, quote.id)}
+				role="listitem"
+			>
+				<Quote author={quote.author}>{quote.text}</Quote>
+			</div>
+		{/each}
+	</div>
 </section>
