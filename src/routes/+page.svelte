@@ -38,7 +38,7 @@
 
     // --- Geolocation ---
 	const TARGET = { latitude: 42.05910523134263, longitude: 19.517268301553923 };
-	const RADIUS = 15; // meters
+	const RADIUS = 100; // meters
 
 
     	const LOCATION_QUOTE = {
