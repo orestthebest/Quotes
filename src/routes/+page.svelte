@@ -1,4 +1,6 @@
 <script>
+	import { onMount } from 'svelte';
+	import { getDistance, isPointWithinRadius } from 'geolib';
 	import Quote from '#lib/components/Quote.svelte';
 
 	let quotes = $state([
@@ -34,6 +36,55 @@
 		}
 	]);
 
+    // --- Geolocation ---
+	const TARGET = { latitude: 42.05910523134263, longitude: 19.517268301553923 };
+	const RADIUS = 15; // meters
+
+
+    	const LOCATION_QUOTE = {
+		id: 'location',
+		author: 'Orest Bashi',
+		text: 'You have found the easter egg.',
+		column: 'left'
+	};
+
+	let distanceToTarget = $state(null);
+	let geoError = $state('');
+
+    	function handlePosition(position) {
+		const current = {
+			latitude: position.coords.latitude,
+			longitude: position.coords.longitude
+		};
+
+		distanceToTarget = getDistance(current, TARGET);
+
+		const inZone = isPointWithinRadius(current, TARGET, RADIUS);
+		const hasQuote = quotes.some((quote) => quote.id === LOCATION_QUOTE.id);
+
+		if (inZone && !hasQuote) {
+			quotes.push({ ...LOCATION_QUOTE });
+		} else if (!inZone && hasQuote) {
+			quotes = quotes.filter((quote) => quote.id !== LOCATION_QUOTE.id);
+		}
+	}
+
+	onMount(() => {
+		if (!('geolocation' in navigator)) {
+			geoError = 'Geolocation is not supported';
+			return;
+		}
+
+		const watchId = navigator.geolocation.watchPosition(
+			handlePosition,
+			(error) => (geoError = error.message),
+			{ enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+		);
+
+		return () => navigator.geolocation.clearWatch(watchId);
+	});
+
+    	// --- Drag and drop ---
 	function startDrag(event, id) {
 		event.dataTransfer.setData('text/plain', id);
 		event.dataTransfer.effectAllowed = 'move';
